@@ -27,7 +27,7 @@ public class ProductsPage extends BasePage {
     public WebElement shoppingCart;
 
 
-    public List<JSONObject> AddProductsToCart(Integer amountToAdd) {
+    public List<JSONObject> AddProductsToCartAndRetrieveTheirValues(Integer amountToAdd) {
         driver.get(baseUrl);
         List<JSONObject> allInventoryItemsData = new ArrayList<>();
         List<WebElement> inventoryItems = driver.findElements(By.xpath(inventoryItemDiv));
@@ -36,8 +36,8 @@ public class ProductsPage extends BasePage {
         }
         for(int i=0 ; i < amountToAdd; i++) {
             String inventoryItemNameValue = inventoryItems.get(i).findElement(By.xpath(inventoryItemName)).getText();
-            WebElement addToCartElement = inventoryItems.get(i).findElement(By.xpath(addToCartButton));
-            String addToCartButtonText = addToCartElement.getText();
+            WebElement addToCartButton = inventoryItems.get(i).findElement(By.xpath(this.addToCartButton));
+            String addToCartButtonText = addToCartButton.getText();
             Assert.assertTrue(addToCartButtonText.equalsIgnoreCase("add to cart"),
                     inventoryItemNameValue + " Button text is " + addToCartButtonText +
                     " instead of Add To Cart");
@@ -50,7 +50,7 @@ public class ProductsPage extends BasePage {
                     "'description': '" + inventoryItemDescriptionValue.replace("'", "").trim() + "'," +
                     "}");
 
-            click(addToCartElement);
+            click(addToCartButton);
             allInventoryItemsData.add(inventoryItemData);
         }
         ValidateItemsCounterIsCorrect(String.valueOf(amountToAdd));

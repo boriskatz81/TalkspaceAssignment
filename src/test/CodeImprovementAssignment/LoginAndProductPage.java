@@ -1,6 +1,7 @@
-package CodeImprovement;
+package CodeImprovementAssignment;
 
 import org.json.JSONObject;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -12,6 +13,7 @@ import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Base64;
 
@@ -72,8 +74,8 @@ public class LoginAndProductPage {
     public String productElementXPath = "//div[@class='product-item'][1]";
 
     public void uploadProductImage() {
-        String absoluteFilePath = "C:\\Users\\UserName\\Documents\\product_image.jpg";
-        fill(fileUpload , absoluteFilePath);
+        Path absoluteFilePath = Path.of(System.getProperty("user.home"), "Documents", "product_image.jpg");
+        fill(fileUpload , absoluteFilePath.toString());
         System.out.println("Uploaded file from: " + absoluteFilePath);
         click(uploadButton);
     }
@@ -100,7 +102,7 @@ public class LoginAndProductPage {
     }
 
     public void doSomethingWithProduct() {
-        WebElement productElement = driver.findElement(org.openqa.selenium.By.xpath(productElementXPath));
+        WebElement productElement = driver.findElement(By.xpath(productElementXPath));
         click(productElement);
         System.out.println("Product selected: " + productElement.getText());
     }

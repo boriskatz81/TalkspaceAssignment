@@ -1,19 +1,28 @@
 Feature: E-Commerce Product Management
 
+# Add new book to the catalog and validating its functionality
 Scenario: Add a book to catalog
   Given I login to the app with manager
   Given I have a new product with details
      | name       | price | category | color |
      | TestItem   | 29.99 | Books    | NA    |
+
+  # Products within the catalog must be unique in name/ color and category - if one already exist - try different data
   And the product with the same name color and category does not already exist in the database
   When I create the product through API
+
+  # If the status is not OK - fail the test, print the error message and don't go further
   And I verify the response status from API is correct
   And I retrieve new product ID and other parameters from API response
   And I verify the product exists in database
   And I verify the product ID is identical to the ID from API response
   And I verify the product details corresponds to the inserted data or data from API response
+
+  # Those default values might include values like: purchasedAmount = 0 or updatedDate and createdDate = Today
   And I verify the product default details corresponds to the expected ones
   Then the product should be created successfully
+
+  # Validate, not a manager can see the newly created product and successfully purchase it
   Given I login to the app as a customer
   And I enter products page
   When I see that the created product exists within products list with correct name and data
@@ -22,7 +31,8 @@ Scenario: Add a book to catalog
   And I verify purchasedAmount field within database has been incremented
   Then the product performance works fine
 
-Scenario: Add another book to catalog
+# Deliberately setting the same name but not the same category - to validate it is still possible
+Scenario: Add another product to catalog
   Given I login to the app with manager
   Given I have a new product with details
      | name       | price | category |  color |
@@ -44,6 +54,7 @@ Scenario: Add another book to catalog
   And I verify purchasedAmount field within database has been incremented
   Then the product performance works fine
 
+# Same names and, from time to time - same category or color but never all 3 the same
 Scenario: Create multiple products
   Given I login to the app with manager
   Given I have several products with details
@@ -75,7 +86,7 @@ Scenario: Update product
   Given I have a product in the system with details
        | name       | ID  |
        | TestItem   | 123 |
-  When I update the product with details
+  Given I update the product with details
          | description       | price  |  category    |  units  | discount | weight | color | manufacturer |
          | new description   | 49.99  |  Electronics |  100    | 20       | 2.5    | black | Intel        |
 
@@ -93,6 +104,8 @@ Scenario: Process order and logout
   Given I have an active order
   When I process the order through API
   And I verify the response status from API is correct
+
+  # After completing the order - no further orders should be found on my page
   When I verify I have no pending orders
   And I logout from the system
   Then Order processing has been completed successfully

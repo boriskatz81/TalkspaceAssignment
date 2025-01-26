@@ -3,12 +3,9 @@ package pageObjects;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import utilities.ConfigReader;
 
 public class LogInPage extends BasePage {
-
-    public String baseUrl = "https://www.saucedemo.com/v1/";
-
-    public String passwordValue = "secret_sauce";
     public LogInPage(WebDriver driver) {super(driver);}
 
     @FindBy(id = "user-name")
@@ -26,16 +23,16 @@ public class LogInPage extends BasePage {
     public String expectedLockedUserError = "Epic sadface: Sorry, this user has been locked out.";
 
     public void LogIn(String username) {
-        driver.get(baseUrl);
+        driver.get(ConfigReader.get("baseLoginUrl"));
         fillText(userNameInput, username);
-        fillText(passwordInput, passwordValue);
+        fillText(passwordInput, ConfigReader.get("password"));
         click(logInButton);
     }
 
     public String NegativeLogIn(String username) {
-        driver.get(baseUrl);
+        driver.get(ConfigReader.get("baseLoginUrl"));
         fillText(userNameInput, username);
-        fillText(passwordInput, passwordValue);
+        fillText(passwordInput, ConfigReader.get("password"));
         click(logInButton);
         return logInErrorMessage.getText();
     }

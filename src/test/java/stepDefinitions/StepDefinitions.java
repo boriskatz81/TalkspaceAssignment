@@ -12,6 +12,18 @@ public class StepDefinitions {
         System.out.println("Logging in as manager");
     }
 
+    @Given("I login to the app as a customer")
+    public void i_login_to_the_app_as_a_customer() {
+        System.out.println("Logging in as a customer and not as a manager");
+    }
+
+    @And("I enter products page")
+    public void i_enter_products_page() {
+        System.out.println("entering products page");
+    }
+
+
+    // Single product creation functions
     @Given("I have a new product with details")
     public void i_have_a_new_product_with_details(io.cucumber.datatable.DataTable dataTable) {
         System.out.println("Creating a new product with the following details : " + dataTable);
@@ -31,7 +43,7 @@ public class StepDefinitions {
     @And("I verify the response status from API is correct")
     public void i_verify_the_response_status_from_API_is_correct() {
         System.out.println("Validate the status is 200 (successful)");
-        System.out.println("If not - fail the test and print the resp0nse error message");
+        System.out.println("If not - fail the test and print the response error message");
     }
 
     @And("I retrieve new product ID and other parameters from API response")
@@ -64,16 +76,6 @@ public class StepDefinitions {
         System.out.println("Product creation was successful.");
     }
 
-    @Given("I login to the app as a customer")
-    public void i_login_to_the_app_as_a_customer() {
-        System.out.println("Logging in as a customer and not as a manager");
-    }
-
-    @And("I enter products page")
-    public void i_enter_products_page() {
-        System.out.println("entering products page");
-    }
-
     @When("I see that the created product exists within products list with correct name and data")
     public void i_see_that_the_created_product_exists_within_products_list_with_correct_name_and_data() {
         System.out.println("Validate I can find the created product");
@@ -91,17 +93,18 @@ public class StepDefinitions {
 
     @And("I verify purchasedAmount field within database has been incremented")
     public void i_verify_purchasedAmount_field_within_database_has_been_incremented() {
-        System.out.println("Verify in DB - 'purchasedAmount' has been incrementd");
+        System.out.println("Verify in DB - 'purchasedAmount' has been incremented");
     }
 
     @Then("the product performance works fine")
     public void the_product_performance_works_fine() {
         System.out.println("All product creation steps were completed successfully");
     }
+    ///////////////////////////////////////////////////////////////////////////////////
 
 
 
-
+    // Multiple product creation functions
     @Given("I have several products with details")
     public void i_have_several_products_with_details(io.cucumber.datatable.DataTable dataTable) {
         System.out.println("several new product with the following details : " + dataTable);
@@ -168,15 +171,17 @@ public class StepDefinitions {
     public void i_verify_purchased_amount_field_within_database_has_been_incremented_for_each_product() {
         System.out.println("Verify for each product in DB - 'purchasedAmount' has been incremented");
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+    // Single product update functions
     @Given("I have a product in the system with details")
     public void i_have_a_product_in_the_system_with_details(io.cucumber.datatable.DataTable dataTable) {
         System.out.println("I have an existing product with the following details : " + dataTable);
     }
 
-    @When("I update the product with details")
+    @Given("I update the product with details")
     public void i_update_the_product_with_details(io.cucumber.datatable.DataTable dataTable) {
         System.out.println("Updating existing product with the following details - " + dataTable);
     }
@@ -185,7 +190,6 @@ public class StepDefinitions {
     public void i_update_the_product_through_API() {
         System.out.println("Updating the product via API. Validate the status is 200 (successful)");
         System.out.println("If not, fail the test and print the status and failure message");
-        System.out.println("If yes - validate all the data has been successfully updated in database");;
     }
 
     @And("I verify all the product data has been correctly updated in database")
@@ -207,7 +211,10 @@ public class StepDefinitions {
     public void product_updating_process_has_been_completed_successfully() {
         System.out.println("Product updating process was completed successfully");
     }
+    ///////////////////////////////////////////////////////////////////////////////////////
 
+
+    // Complete order functions
     @Given("I have an active order")
     public void i_have_an_active_order() {
         System.out.println("I have an active order to be proceeded");

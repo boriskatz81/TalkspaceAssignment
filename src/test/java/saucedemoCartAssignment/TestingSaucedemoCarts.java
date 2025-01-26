@@ -1,4 +1,4 @@
-package saucedemoTests;
+package saucedemoCartAssignment;
 
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -8,22 +8,22 @@ import pageObjects.LogInPage;
 import pageObjects.ProductsPage;
 import pageObjects.ShoppingCartPage;
 import utilities.Base;
+import utilities.ConfigReader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestingSaucedemo extends Base {
+public class TestingSaucedemoCarts extends Base {
     ProductsPage productsPage;
     ShoppingCartPage shoppingCartPage;
 
 
     @Test
-    public void Test01_AddProductToChat() {
+    public void Test01_AddProductToCart() {
         initChromeDriver();
-        List<JSONObject> addedCarts = AddProductsToCart( 1, "standard_user");
+        List<JSONObject> addedCarts = AddProductsToCartAndRetrieveTheirValues( 1, ConfigReader.get("standardUsername"));
 
-        List<JSONObject> shoppingListCarts = RetrieveAllCartsFromShoppingCart();
-        List<String> errList = FindExpectedCartAndValidateItsData(addedCarts, shoppingListCarts);
+        List<String> errList = FindExpectedCartInShoppingCartAndValidateItsData(addedCarts);
 
         shoppingCartPage.RemoveAllItemsFromShoppingCart();
         Assert.assertTrue(errList.size() <=0, String.valueOf(errList));
@@ -31,12 +31,11 @@ public class TestingSaucedemo extends Base {
     }
 
     @Test
-    public void Test02_AddSeveralProductsToChat() {
+    public void Test02_AddSeveralProductsToCart() {
         initChromeDriver();
-        List<JSONObject> addedCarts = AddProductsToCart( 5, "standard_user");
+        List<JSONObject> addedCarts = AddProductsToCartAndRetrieveTheirValues( 5, ConfigReader.get("standardUsername"));
 
-        List<JSONObject> shoppingListCarts = RetrieveAllCartsFromShoppingCart();
-        List<String> errList = FindExpectedCartAndValidateItsData(addedCarts, shoppingListCarts);
+        List<String> errList = FindExpectedCartInShoppingCartAndValidateItsData(addedCarts);
 
         shoppingCartPage.RemoveAllItemsFromShoppingCart();
         Assert.assertTrue(errList.size() <=0, String.valueOf(errList));
@@ -46,7 +45,7 @@ public class TestingSaucedemo extends Base {
     @Test
     public void Test03_CheckoutOnAddedProduct() {
         initChromeDriver();
-        AddProductsToCart( 1, "standard_user");
+        AddProductsToCartAndRetrieveTheirValues( 1, ConfigReader.get("standardUsername"));
         RetrieveAllCartsFromShoppingCart();
         shoppingCartPage.ClickOnCheckout();
         JSONObject checkoutData = new JSONObject("{" +
@@ -54,8 +53,10 @@ public class TestingSaucedemo extends Base {
                 "'lastName': 'Doe'," +
                 "'postalCode': '123'" +
                 "}");
+
         CheckoutPage checkoutPage = new CheckoutPage(driver);
         JSONObject checkoutPageCompleteData = checkoutPage.PerformCheckoutToAddedItem(checkoutData);
+
         JSONObject expectedCompleteTexts = new JSONObject("{" +
                 "'completeHeader': '" + checkoutPage.expectedCompleteHeader + "'," +
                 "'completeText': '" + checkoutPage.expectedCompleteText + "'," +
@@ -69,19 +70,19 @@ public class TestingSaucedemo extends Base {
     public void Test04_AttemptToLogInWithLockedUser() {
         initChromeDriver();
         LogInPage logInPage = new LogInPage(driver);
-        String errorMessage = logInPage.NegativeLogIn("locked_out_user");
+        String errorMessage = logInPage.NegativeLogIn(ConfigReader.get("lockedOutUsername"));
         Assert.assertTrue(errorMessage.equalsIgnoreCase(logInPage.expectedLockedUserError) ,
                 "Error is " + errorMessage + " instead of " + logInPage.expectedLockedUserError);
 
         PrintToConfirmTestEnding();
     }
 
-    public List<JSONObject> AddProductsToCart(Integer productsToAdd, String username) {
-        productsPage = new ProductsPage(driver);
+    public List<JSONObject> AddProductsToCartAndRetrieveTheirValues(Integer productsToAdd, String username) {
         LogInPage logInPage = new LogInPage(driver);
         logInPage.LogIn(username);
 
-        List<JSONObject> addedCarts = productsPage.AddProductsToCart(productsToAdd);
+        productsPage = new ProductsPage(driver);
+        List<JSONObject> addedCarts = productsPage.AddProductsToCartAndRetrieveTheirValues(productsToAdd);
         productsPage.ClickOnShoppingCart();
         return addedCarts;
     }
@@ -92,15 +93,17 @@ public class TestingSaucedemo extends Base {
         return shoppingCartPage.RetrieveAllItemsWithinShoppingCart();
     }
 
-    public List<String> FindExpectedCartAndValidateItsData(List<JSONObject> expectedValues, List<JSONObject> actualValues) {
+    public List<String> FindExpectedCartInShoppingCartAndValidateItsData(List<JSONObject> addedProducts) {
+        List<JSONObject> itemsInShoppingCart = RetrieveAllCartsFromShoppingCart();
+
         List<String> errList = new ArrayList<>();
-        if(expectedValues.size() != actualValues.size()) {
-            errList.add("Invalid amount of carts within Shopping List. Expected - " + expectedValues.size() +
-                    " Actual is - " + actualValues.size());
+        if(addedProducts.size() != itemsInShoppingCart.size()) {
+            errList.add("Invalid amount of carts within Shopping List. Expected - " + addedProducts.size() +
+                    " Actual is - " + itemsInShoppingCart.size());
         }
-        for(JSONObject expectedData: expectedValues) {
+        for(JSONObject expectedData: addedProducts) {
             boolean expectedCartWasFound = false;
-            for(JSONObject actualData: actualValues) {
+            for(JSONObject actualData: itemsInShoppingCart) {
                 if(actualData.getString("name").equalsIgnoreCase(expectedData.getString("name"))){
                     expectedCartWasFound = true;
                     errList = ValidateExpectedAndActualData(expectedData, actualData, errList);
